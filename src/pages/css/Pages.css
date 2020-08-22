@@ -1,3 +1,14 @@
-.site-layout .site-layout-background {
+.site-layout .site-layout-header {
   background: #fff;
+  padding: 6px 0px 0px 20px;
+}
+
+.site-layout .site-layout-content {
+  margin: 16px 16px;
+}
+
+.site-layout .site-layout-content-div {
+  background: #fff;
+  padding: 24px;
+  min-height: 360px;
 }

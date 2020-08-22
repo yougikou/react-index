@@ -12,22 +12,18 @@ class App extends React.Component<any, any> {
     };
   }
 
-  componentDidMount() {
-    // let requestParams = { url: "http://192.168.31.111/sapix/", showParent: false }
-    // listDirItems(requestParams).then((data)=>{
-    //   this.setState({
-    //     isLoading: false,
-    //     items: data
-    //   })
-    // })
-  }
+  
 
   render() {
+    const { Footer } = Layout;
     return (
       <HashRouter>
         <Layout style={{ minHeight: '100vh' }}>
           <SideMenu />
-          <Route path="/" component={Settings} />
+          <Layout>
+            <Route path="/" component={Settings} />
+            <Footer style={{ textAlign: 'center' }}>Ant Design ©2018 Created by Ant UED</Footer>
+          </Layout>
         </Layout>
       </HashRouter>
     );
