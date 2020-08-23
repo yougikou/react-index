@@ -1,5 +1,6 @@
 import React from 'react';
 import { Typography, Layout, Tabs, Form, Input, Button } from 'antd';
+import { getSettings, saveSettings } from "../services/DataService";
 import "./css/Pages.css";
 
 const layout = {
@@ -23,37 +24,38 @@ const onFinishFailed = (errorInfo: any) => {
 };
 
 class Settings extends React.Component<any, any> {
+  static basicSettingKey: string = "setting-basic";
 
   constructor(props: any) {
     super(props);
-    var settingObj = localStorage.getItem('setting');
-    if (settingObj !== undefined && settingObj !== null) {
-      this.state = {
-        settings: JSON.parse(settingObj),
-        treeData: []
-      };
-    } else {
-      this.state = {
-        settings: null,
-        treeData: []
-      };
-    }
+    let settingJson = getSettings();
+    this.state = {
+      settings: settingJson,
+    };
   }
 
-  componentDidMount() {
+  onPanel1Finish(values: any) {
+    saveSettings(values);
+    var settingObj = getSettings(); 
+    this.setState({
+      settings: settingObj
+    })
   }
 
-  onFinish(values: any) {
-    console.log('Success:', values);
-    localStorage.setItem('setting', JSON.stringify(values));
-    var settingObj = localStorage.getItem('setting');
-    if (settingObj !== undefined && settingObj !== null) {
-      this.setState({
-        settings: JSON.parse(settingObj)
-      })
-    }
+  onPanel2Finish(values: any) {
+    let lines = values.categories.split(';');
+    
+    saveSettings(values);
+    var settingObj = getSettings(); 
+    this.setState({
+      settings: settingObj
+    })
   }
-  
+
+  getCategoriesStr() {
+
+  }
+
   render() {
     const { Title } = Typography
     const { Header, Content } = Layout;
@@ -71,16 +73,19 @@ class Settings extends React.Component<any, any> {
                 <Form
                   {...layout}
                   name="basic"
-                  initialValues={{  }}
-                  onFinish={this.onFinish.bind(this)}
+                  size="small"
+                  initialValues={{ 
+                    rootUrl: this.state.settings?.rootUrl
+                  }}
+                  onFinish={this.onPanel1Finish.bind(this)}
                   onFinishFailed={onFinishFailed}
                 >
                   <Form.Item
-                    label="Root Index URL"
+                    label="Root URL"
                     name="rootUrl"
                     rules={[{ required: true, message: 'Please input your root index page url!' }]}
                   >
-                    <Input value={this.state.settings?.rootUrl}/>
+                    <Input />
                   </Form.Item>
                   <Form.Item {...tailLayout}>
                     <Button type="primary" htmlType="submit">
@@ -90,6 +95,26 @@ class Settings extends React.Component<any, any> {
                 </Form>
               </TabPane>
               <TabPane tab="Rules" key="2">
+
+               <Form
+                  {...layout}
+                  name="basic"
+                  size="small"
+                  initialValues={{ }}
+                  onFinish={this.onPanel2Finish.bind(this)}
+                >
+                  <Form.Item
+                    label="Categories"
+                    name="categories"
+                  >
+                    <Input.TextArea />
+                  </Form.Item>
+                  <Form.Item {...tailLayout}>
+                    <Button type="primary" htmlType="submit">
+                      Save
+                    </Button>
+                  </Form.Item>
+                </Form>
               </TabPane>
             </Tabs>
           </div>
