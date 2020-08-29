@@ -1,6 +1,6 @@
 import React from 'react';
 import { Typography, Layout, Tabs, Form, Input, Button } from 'antd';
-import { getSettings, saveSettings } from "../services/DataService";
+import { getSettings, saveSettings, CategoryType } from "../services/DataService";
 import "./css/Pages.css";
 
 const layout = {
@@ -23,37 +23,56 @@ const onFinishFailed = (errorInfo: any) => {
   console.log('Failed:', errorInfo);
 };
 
-class Settings extends React.Component<any, any> {
+export interface StateType {
+  rootUrl: string;
+  categories: CategoryType[];
+}
+
+class Settings extends React.Component<any, StateType> {
   static basicSettingKey: string = "setting-basic";
 
   constructor(props: any) {
     super(props);
     let settingJson = getSettings();
     this.state = {
-      settings: settingJson,
+      rootUrl: settingJson.rootUrl,
+      categories: settingJson.categories
     };
   }
 
   onPanel1Finish(values: any) {
     saveSettings(values);
-    var settingObj = getSettings(); 
+    var settingJson = getSettings(); 
     this.setState({
-      settings: settingObj
+      rootUrl: settingJson.rootUrl,
+      categories: settingJson.categories
     })
   }
 
   onPanel2Finish(values: any) {
-    let lines = values.categories.split(';');
-    
-    saveSettings(values);
-    var settingObj = getSettings(); 
-    this.setState({
-      settings: settingObj
-    })
+    console.log(values)    
+    // saveSettings(values);
+    // var settingObj = getSettings(); 
+    // this.setState({
+    //   settings: settingObj
+    // })
   }
 
-  getCategoriesStr() {
+  deleteCurrentRow(index: number): void {
+    if (index > -1) {
+      var newCategories = this.state.categories;
+      newCategories.splice(index, 1);
+      this.setState({
+        categories:newCategories
+      })
+    }
+  }
 
+  addNewRow() {
+    var newCategories = this.state.categories.concat([{ name: "", filterStr: "" }]);
+    this.setState({
+      categories:newCategories
+    })
   }
 
   render() {
@@ -68,14 +87,14 @@ class Settings extends React.Component<any, any> {
         </Header>
         <Content className="site-layout-content">
           <div className="site-layout-content-div">
-            <Tabs defaultActiveKey="1">
+            <Tabs defaultActiveKey="2">
               <TabPane tab="Basic" key="1">
                 <Form
                   {...layout}
                   name="basic"
                   size="small"
                   initialValues={{ 
-                    rootUrl: this.state.settings?.rootUrl
+                    rootUrl: this.state.rootUrl
                   }}
                   onFinish={this.onPanel1Finish.bind(this)}
                   onFinishFailed={onFinishFailed}
@@ -95,25 +114,35 @@ class Settings extends React.Component<any, any> {
                 </Form>
               </TabPane>
               <TabPane tab="Rules" key="2">
-
-               <Form
+                <Form
                   {...layout}
                   name="basic"
                   size="small"
-                  initialValues={{ }}
                   onFinish={this.onPanel2Finish.bind(this)}
                 >
                   <Form.Item
                     label="Categories"
                     name="categories"
                   >
-                    <Input.TextArea />
+                    {this.state.categories.length === 0 ? "Click Add new Category button to add" : ""}
+                    {this.state.categories.map((item: CategoryType, index: number) => {
+                      return(
+                        <Input.Group compact>
+                          <Button onClick={() => this.deleteCurrentRow(index)}>-</Button>
+                          <Input required name="name" style={{ width: '20%' }} value={item.name}/>
+                          <Input required name="filterStr" style={{ width: '30%' }} value={item.filterStr}/>
+                        </Input.Group>
+                      );
+                    })}
                   </Form.Item>
                   <Form.Item {...tailLayout}>
-                    <Button type="primary" htmlType="submit">
-                      Save
+                    <Button htmlType="submit" type="primary">
+                      Submit
                     </Button>
-                  </Form.Item>
+                    <Button htmlType="button" style={{ margin: '0 8px' }} onClick={() => this.addNewRow()}>
+                      Add New Category
+                    </Button>
+                  </Form.Item>                
                 </Form>
               </TabPane>
             </Tabs>
