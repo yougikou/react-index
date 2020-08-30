@@ -3,22 +3,34 @@ import { HashRouter, Route } from "react-router-dom";
 import { Layout } from 'antd';
 import { SideMenu } from "./components/LayoutWidgets";
 import IndexPage from "./pages/IndexPage";
-import Settings from "./pages/Settings";
-import { getSettings, getCategories } from "./services/DataService";
+import Settings from "./pages/settings";
+import { getSettings, getCategories, CategoryType } from "./services/DataService";
 
-class App extends React.Component<any, any> {
+interface StateType {
+  rootUrl: string;
+  categories: CategoryType[];
+}
+class App extends React.Component<any, StateType> {
 
   constructor(props: any) {
     super(props);
-    let settingJson = getSettings();
     this.state = {
-      settings: settingJson,
+      rootUrl: "",
+      categories: []
     };
+  }
+
+  componentDidMount(){
+    const {rootUrl} = getSettings();
+    this.setState({
+      rootUrl: rootUrl,
+      categories: getCategories()
+    })
   }
 
   render() {
     const { Footer } = Layout;
-    const categories = getCategories();
+    const {rootUrl, categories} = this.state;
     return (
       <HashRouter>
         <Layout style={{ minHeight: '100vh' }}>
@@ -26,12 +38,12 @@ class App extends React.Component<any, any> {
           <Layout>
             {categories.map((item: any, index: any) => {
               return (
-                <Route path={item.linkPath}>
-                  <IndexPage url={this.state.settings.rootUrl} category={item} />
+                <Route path={item.linkPath} key={index}>
+                  <IndexPage url={rootUrl} category={item} />
                 </Route>
               );
             })}
-            <Route path="/setting" component={Settings} />
+            <Route path="/setting" component={Settings} key="setting" />
             <Footer style={{ textAlign: 'center' }}>Ant Design ©2018 Created by Ant UED</Footer>
           </Layout>
         </Layout>

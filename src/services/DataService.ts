@@ -39,19 +39,19 @@ export function saveSettings(obj: any) : void{
 }
 
 export function getCategories():CategoryType[] {
-  let settings = getSettings();
+  const {rootUrl, categories} = getSettings();
   // index url未设定时，返回空分类 - 不显示菜单
-  if (settings.rootUrl.length === 0) {
+  if (rootUrl.length === 0) {
     let emtpyArr: CategoryType[] = []
     return emtpyArr;
   }
 
   // 返回分类 - 显示相应菜单
-  if (settings.categories.length > 0 ) {
-    return settings.categories.map((item: CategoryType, index: any) => {
-      // linkPath由name以及项数生成
-      let linkPath = { linkPath: "cate_"+ index + "_" + item.name }
-      let mergedItem = {...item, ...linkPath};
+  if (categories.length > 0 ) {
+    return categories.map((item: CategoryType, index: any) => {
+      // key, linkPath由name以及项数生成
+      let keyLinkPath = {linkPath: "cate_"+ index + "_" + item.name}
+      let mergedItem = {...item, ...keyLinkPath};
       return mergedItem
     });
   } else {

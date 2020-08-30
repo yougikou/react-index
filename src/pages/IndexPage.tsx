@@ -1,6 +1,6 @@
 import React from 'react';
 import { Typography, Layout } from 'antd';
-import "./css/Pages.css";
+import "./css/pages.css";
 
 export interface categoryType {
   name: string;
