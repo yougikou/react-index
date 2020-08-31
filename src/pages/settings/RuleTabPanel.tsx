@@ -37,6 +37,7 @@ export class RuleTabPanel extends React.Component<any, StateType> {
         key: loopIndex + 1,
         name: _item.name,
         filterStr: _item.filterStr,
+        iconStr: _item.iconStr,
         isNew: false
       });
       loopIndex++;
@@ -53,6 +54,12 @@ export class RuleTabPanel extends React.Component<any, StateType> {
     if (index > -1) {
       tmp.splice(index, 1);
     }
+    if (record.isNew) {
+      this.setState({
+        categoryView: tmp
+      })
+      return;
+    }
     saveSettings({categories: tmp});
     message.success("Category rule deleted.");
     window.location.reload(false);
@@ -63,7 +70,7 @@ export class RuleTabPanel extends React.Component<any, StateType> {
     let tmp = [...categoryView];
     this.setState({
       indexSeq: indexSeq + 1,
-      categoryView: tmp.concat([{ key: indexSeq + 1, name: "", filterStr: "", isNew: true }])
+      categoryView: tmp.concat([{ key: indexSeq + 1, name: "", filterStr: "", iconStr: "", isNew: true }])
     })
   }
 
@@ -89,6 +96,7 @@ export class RuleTabPanel extends React.Component<any, StateType> {
           cancelSaving = true;
       }
       delete _item.key;
+      delete _item.isNew;
     })
     if (cancelSaving) {
       return;
@@ -116,6 +124,10 @@ export class RuleTabPanel extends React.Component<any, StateType> {
           <Column title="Filter string" dataIndex="filterStr" key="filterStr"
             render={(text: any, record:CategoryViewType)=>{
               return(<Input readOnly={!record.isNew} bordered={record.isNew} value={record.filterStr} onChange={(e)=>this.handleInputChange(e, "filterStr", record)}  />);
+            }} />
+          <Column title="Icon string" dataIndex="IconStr" key="IconStr"
+            render={(text: any, record:CategoryViewType)=>{
+              return(<Input readOnly={!record.isNew} bordered={record.isNew} value={record.iconStr} onChange={(e)=>this.handleInputChange(e, "iconStr", record)}  />);
             }} />
           <Column title="Action" dataIndex="action" render={(text: any, record:CategoryViewType)=>{
             return(<Button type="dashed" onClick={()=> this.deleteCurrentRow(record)}>Delete</Button>);

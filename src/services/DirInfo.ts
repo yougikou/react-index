@@ -2,6 +2,7 @@ export interface DirInfoParamsType {
     url: string;
     showParent?: boolean;
     extension?: string[];
+    filterStr?: string;
 }
 
 export interface DirItemType {
@@ -29,6 +30,10 @@ export async function listDirItems(request: DirInfoParamsType): Promise<DirItemT
         items.forEach((item) => {
             let itemStr = item.innerText.trim();
             let nameStr = itemStr.replace("/", "")
+            if (request.filterStr !== undefined && request.filterStr.length > 0 &&
+                itemStr !== "Parent Directory" && itemStr.indexOf(request.filterStr) < 0 ) {
+                return;
+            }
             data.push({
                 pathString: itemStr,
                 linkString: '/' + nameStr,
@@ -71,6 +76,10 @@ export async function listFiles(request: DirInfoParamsType): Promise<DirItemType
                 request.extension.length > 0 && !request.extension.includes(extStr)) {
                 return;
             }
+            if (request.filterStr !== undefined && request.filterStr.length > 0 &&
+                itemStr !== "Parent Directory" && itemStr.indexOf(request.filterStr) < 0 ) {
+                return;
+            }
             data.push({
                 pathString: itemStr,
                 linkString: '/' + nameStr,
@@ -97,12 +106,21 @@ export async function listSubDirs(request: DirInfoParamsType): Promise<DirItemTy
         var temp = document.createElement("temp");
         temp.innerHTML = html;
         var items = Array.from(temp.getElementsByTagName("a"));
+        if (!request.showParent) {
+            items = items.filter((item) => {
+                return item.innerText.trim() !== "Parent Directory";
+            });
+        }
 
         items.forEach((item) => {
             let itemStr = item.innerText.trim();
             let nameStr = itemStr.replace("/", "");
             // exclude file
             if (itemStr.indexOf("/") < 0 && itemStr !== "Parent Directory") {
+                return;
+            }
+            if (request.filterStr !== undefined && request.filterStr.length > 0 &&
+                itemStr !== "Parent Directory" && itemStr.indexOf(request.filterStr) < 0 ) {
                 return;
             }
             data.push({

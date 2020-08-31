@@ -1,32 +1,46 @@
 import React from 'react';
-import { Typography, Layout } from 'antd';
+import { Typography, Layout, List } from 'antd';
+import { CategoryType } from "../services/DataService";
+import { listSubDirs, DirItemType } from "../services/DirInfo";
 import "./css/pages.css";
 
-export interface categoryType {
-  name: string;
-  iconStr: string;
-  linkPath: string;
+interface PropsType {
+  url: string;
+  category: CategoryType;
 }
 
-export interface propsType {
-  url: string,
-  category: categoryType
+interface StateType {
+  url: string;
+  category: CategoryType;
+  items: DirItemType[];
 }
 
-class IndexPage extends React.Component<any, any> {
-  constructor(props: propsType) {
+
+class IndexPage extends React.Component<PropsType, StateType> {
+  constructor(props: PropsType) {
     super(props);
     this.state = {
       url: props.url,
       category: props.category,
-      items: [],
+      items: []
     };
   }
 
-  render() {
-    const { Title } = Typography
-    const { Header, Content } = Layout;
+  componentDidMount(){
+    const {url, category} = this.state;
+    listSubDirs({
+      url: url, 
+      showParent: false,
+      filterStr: category.filterStr
+    }).then((items: DirItemType[])=> {
+      this.setState({items: items});
+    });
+  }
 
+  render() {
+    const { Title } = Typography;
+    const { Header, Content } = Layout;
+    const { items } = this.state;
     return(
       <Layout className="site-layout">
         <Header className="site-layout-header">
@@ -34,7 +48,13 @@ class IndexPage extends React.Component<any, any> {
         </Header>
         <Content className="site-layout-content">
           <div className="site-layout-content-div">
-            content
+          <List
+            size="small"
+            header={<h1>Directories</h1>}
+            bordered
+            dataSource={items}
+            renderItem={item => <List.Item>{item.name}</List.Item>}
+          />
           </div>
         </Content>
       </Layout>

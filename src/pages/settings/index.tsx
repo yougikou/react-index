@@ -27,7 +27,7 @@ class Settings extends React.Component<any, any> {
         </Header>
         <Content className="site-layout-content">
           <div className="site-layout-content-div">
-            <Tabs defaultActiveKey="2">
+            <Tabs defaultActiveKey="1">
               <TabPane tab="Basic" key="1">
                 <BasicTabPanel />
               </TabPane>

@@ -5,6 +5,7 @@ import "../css/pages.css";
 
 interface StateType {
   rootUrl: string;
+  scriptUrl: string;
 }
 
 export class BasicTabPanel extends React.Component<any, StateType> {
@@ -13,30 +14,36 @@ export class BasicTabPanel extends React.Component<any, StateType> {
     super(props);
     this.state = {
       rootUrl: "",
+      scriptUrl: "",
     };
   }
 
   componentDidMount(){
-    let settingJson = getSettings();
+    const {rootUrl, scriptUrl} = getSettings();
     this.setState({
-      rootUrl: settingJson.rootUrl
+      rootUrl: rootUrl,
+      scriptUrl: scriptUrl
     })
   }
 
-  handleChange(e: any) {
-    this.setState({rootUrl: e.target.value});
+  handleChange(e: any, key: string) {
+    let field: any = {};
+    field[key] = e.target.value;
+    this.setState({...field});
   }
 
   onFinish() {
     saveSettings(this.state);
     message.success("Root url setting saved.");
+    window.location.reload(false);
   }
 
   render() {
-    const { rootUrl } = this.state;
+    const { rootUrl, scriptUrl } = this.state;
     return(
       <div>
-        <Input value={rootUrl} onChange={(e)=> this.handleChange(e)}/>
+        <Input addonBefore="Root Url: " value={rootUrl} onChange={(e)=> this.handleChange(e, "rootUrl")}/>
+        <Input addonBefore="Iconfont Script Url: " value={scriptUrl} onChange={(e)=> this.handleChange(e, "scriptUrl")}/>
         <Button type="primary" style={{ marginTop: 16 }} onClick={()=> this.onFinish()}>
           Save
         </Button>

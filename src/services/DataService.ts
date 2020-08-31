@@ -7,6 +7,7 @@ export interface CategoryType {
 
 export interface SettingDataType {
   rootUrl: string;
+  scriptUrl: string;
   categories: CategoryType[];
 }
 
@@ -16,6 +17,7 @@ export function getSettings(): SettingDataType {
   // 初始化保存数据模型，以便合并旧格式数据
   let settingObj: SettingDataType = {
     rootUrl: "",
+    scriptUrl: "",
     categories: [],
   };
 
@@ -41,26 +43,28 @@ export function saveSettings(obj: any) : void{
 export function getCategories():CategoryType[] {
   const {rootUrl, categories} = getSettings();
   // index url未设定时，返回空分类 - 不显示菜单
+  let tmp: CategoryType[] = []
   if (rootUrl.length === 0) {
-    let emtpyArr: CategoryType[] = []
-    return emtpyArr;
+    return tmp;
   }
 
   // 返回分类 - 显示相应菜单
   if (categories.length > 0 ) {
-    return categories.map((item: CategoryType, index: any) => {
+    tmp = [...categories];
+    tmp.forEach((item: CategoryType, index: any) => {
       // key, linkPath由name以及项数生成
-      let keyLinkPath = {linkPath: "cate_"+ index + "_" + item.name}
-      let mergedItem = {...item, ...keyLinkPath};
-      return mergedItem
+      item.linkPath = "/cate_"+ index + "_" + item.name;
     });
-  } else {
-    // 返回未分类 - 显示初步内容
-    return [{
+  }
+
+  if (true) {
+    tmp = tmp.concat({
       name: "uncategoried", 
       filterStr: "",
       iconStr: undefined, 
       linkPath: "/uncategoried"
-    }]
+    });
   }
+
+  return tmp;
 }

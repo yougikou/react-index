@@ -2,20 +2,26 @@ import React, { useState } from 'react';
 import { HashRouter, Link } from "react-router-dom";
 import { Menu, Layout } from 'antd';
 import {
-  UserOutlined,
   SettingOutlined,
+  createFromIconfontCN,
 } from '@ant-design/icons';
 import { CategoryType } from "../services/DataService";
 import "./css/LayoutWidgets.css";
 
-export interface propsType {
-  categories: CategoryType[]
+export interface PropsType {
+  scriptUrl: string;
+  categories: CategoryType[];
 }
 
-function SideMenu(props: propsType) {
+function SideMenu(props: PropsType) {
 
   const [collapsed, setCollapsed] = useState(Boolean);
   const { Sider } = Layout;
+  const IconFont = createFromIconfontCN({
+    scriptUrl: [
+      props.scriptUrl
+    ],
+  });
 
   return (
     <HashRouter>
@@ -26,7 +32,7 @@ function SideMenu(props: propsType) {
             return(
               <Menu.Item 
                 key={index} 
-                icon={<UserOutlined />}>
+                icon={<IconFont type={ item.iconStr } />}>
                 <Link to={ item.linkPath }>{item.name}</Link>
               </Menu.Item>
             );

@@ -8,6 +8,7 @@ import { getSettings, getCategories, CategoryType } from "./services/DataService
 
 interface StateType {
   rootUrl: string;
+  scriptUrl: string;
   categories: CategoryType[];
 }
 class App extends React.Component<any, StateType> {
@@ -16,25 +17,27 @@ class App extends React.Component<any, StateType> {
     super(props);
     this.state = {
       rootUrl: "",
+      scriptUrl: "",
       categories: []
     };
   }
 
   componentDidMount(){
-    const {rootUrl} = getSettings();
+    const {rootUrl, scriptUrl} = getSettings();
     this.setState({
       rootUrl: rootUrl,
+      scriptUrl: scriptUrl,
       categories: getCategories()
     })
   }
 
   render() {
     const { Footer } = Layout;
-    const {rootUrl, categories} = this.state;
+    const {rootUrl, scriptUrl, categories} = this.state;
     return (
       <HashRouter>
         <Layout style={{ minHeight: '100vh' }}>
-          <SideMenu categories={categories}/>
+          <SideMenu scriptUrl={scriptUrl} categories={categories}/>
           <Layout>
             {categories.map((item: any, index: any) => {
               return (
