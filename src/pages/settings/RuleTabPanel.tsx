@@ -9,6 +9,7 @@ interface CategoryViewType {
   filterStr: string;
   iconStr?: string;
   linkPath?: string;
+  subCategoryStr?: string;
   isNew: boolean;
 }
 
@@ -19,7 +20,7 @@ interface StateType {
 
 export class RuleTabPanel extends React.Component<any, StateType> {
 
-  constructor(props: any) {
+  constructor(props: Readonly<any>) {
     super(props);
     this.state = {
       indexSeq: -1,
@@ -38,6 +39,7 @@ export class RuleTabPanel extends React.Component<any, StateType> {
         name: _item.name,
         filterStr: _item.filterStr,
         iconStr: _item.iconStr,
+        subCategoryStr: _item.subCategoryStr,
         isNew: false
       });
       loopIndex++;
@@ -62,7 +64,7 @@ export class RuleTabPanel extends React.Component<any, StateType> {
     }
     saveSettings({categories: tmp});
     message.success("Category rule deleted.");
-    window.location.reload(false);
+    window.location.reload();
   }
 
   addNewRow() {
@@ -96,19 +98,30 @@ export class RuleTabPanel extends React.Component<any, StateType> {
           cancelSaving = true;
       }
       delete _item.key;
-      delete _item.isNew;
+      _item.isNew = false;
     })
     if (cancelSaving) {
       return;
     }
     saveSettings({categories: tmp});
     message.success("Category rules saved.");
-    window.location.reload(false);
+    window.location.reload();
   }
 
   render() {
     const { Column } = Table;
     const { categoryView } = this.state;
+    const tableConfig = {
+      expandable: { expandedRowRender: (record: any) => { 
+        return(
+          <span>
+            Sub categories: delimited by comma
+            <Input value={record.subCategoryStr} onChange={(e)=>this.handleInputChange(e, "subCategoryStr", record)} />
+          </span>
+          
+        );
+      }}
+    }
 
     return(
       <div>
@@ -116,18 +129,20 @@ export class RuleTabPanel extends React.Component<any, StateType> {
           Add New
         </Button>
         <Button type="primary" onClick={()=> this.onFinish()}>Save</Button>
-        <Table dataSource={ categoryView }>
+        <Table 
+          {... tableConfig} 
+          dataSource={ categoryView }>
           <Column title="Category name" dataIndex="name" key="name"
             render={(text: any, record:CategoryViewType)=>{
-              return(<Input readOnly={!record.isNew} bordered={record.isNew} value={record.name} onChange={(e)=>this.handleInputChange(e, "name", record)} />);
+              return(<Input value={record.name} onChange={(e)=>this.handleInputChange(e, "name", record)} />);
             }} />
           <Column title="Filter string" dataIndex="filterStr" key="filterStr"
             render={(text: any, record:CategoryViewType)=>{
-              return(<Input readOnly={!record.isNew} bordered={record.isNew} value={record.filterStr} onChange={(e)=>this.handleInputChange(e, "filterStr", record)}  />);
+              return(<Input value={record.filterStr} onChange={(e)=>this.handleInputChange(e, "filterStr", record)}  />);
             }} />
           <Column title="Icon string" dataIndex="IconStr" key="IconStr"
             render={(text: any, record:CategoryViewType)=>{
-              return(<Input readOnly={!record.isNew} bordered={record.isNew} value={record.iconStr} onChange={(e)=>this.handleInputChange(e, "iconStr", record)}  />);
+              return(<Input value={record.iconStr} onChange={(e)=>this.handleInputChange(e, "iconStr", record)}  />);
             }} />
           <Column title="Action" dataIndex="action" render={(text: any, record:CategoryViewType)=>{
             return(<Button type="dashed" onClick={()=> this.deleteCurrentRow(record)}>Delete</Button>);

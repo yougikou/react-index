@@ -10,7 +10,7 @@ interface StateType {
 
 export class BasicTabPanel extends React.Component<any, StateType> {
 
-  constructor(props: any) {
+  constructor(props: Readonly<any>) {
     super(props);
     this.state = {
       rootUrl: "",
@@ -43,6 +43,7 @@ export class BasicTabPanel extends React.Component<any, StateType> {
     return(
       <div>
         <Input addonBefore="Root Url: " value={rootUrl} onChange={(e)=> this.handleChange(e, "rootUrl")}/>
+        <p/>
         <Input addonBefore="Iconfont Script Url: " value={scriptUrl} onChange={(e)=> this.handleChange(e, "scriptUrl")}/>
         <Button type="primary" style={{ marginTop: 16 }} onClick={()=> this.onFinish()}>
           Save

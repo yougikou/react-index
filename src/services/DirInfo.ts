@@ -6,14 +6,20 @@ export interface DirInfoParamsType {
 }
 
 export interface DirItemType {
+    key?: string;
+    title: string;
     pathString: string;
     linkString: string;
-    name: string;
     externsion: string;
     isDir: boolean;
+    children?: DirItemType[];
 }
 
-export async function listDirItems(request: DirInfoParamsType): Promise<DirItemType[]> {
+function filterCategoryItems(items: Array<DirItemType>,cateFilter: string): Array<DirItemType> {
+    return items.filter((item) => {return item.title.indexOf(cateFilter) >= 0})
+}
+
+async function listDirItems(request: DirInfoParamsType): Promise<DirItemType[]> {
     try {
         var data: DirItemType[] = [];
         var response = await fetch(request.url);
@@ -35,9 +41,9 @@ export async function listDirItems(request: DirInfoParamsType): Promise<DirItemT
                 return;
             }
             data.push({
-                pathString: itemStr,
+                title: nameStr,
+                pathString: request.url + itemStr,
                 linkString: '/' + nameStr,
-                name: nameStr,
                 // file start with . not consider it has extension
                 externsion: nameStr.lastIndexOf(".") > 0 ? nameStr.substring(nameStr.lastIndexOf(".")) : "",
                 isDir: itemStr.indexOf("/") > 0 || itemStr === "Parent Directory"
@@ -52,7 +58,7 @@ export async function listDirItems(request: DirInfoParamsType): Promise<DirItemT
     }
 }
 
-export async function listFiles(request: DirInfoParamsType): Promise<DirItemType[]> {
+async function listFiles(request: DirInfoParamsType): Promise<DirItemType[]> {
     try {
         var data: DirItemType[] = [];
         var response = await fetch(request.url);
@@ -81,9 +87,9 @@ export async function listFiles(request: DirInfoParamsType): Promise<DirItemType
                 return;
             }
             data.push({
-                pathString: itemStr,
+                pathString: request.url + itemStr,
                 linkString: '/' + nameStr,
-                name: nameStr,
+                title: nameStr,
                 // file start with . not consider it has extension
                 externsion: extStr,
                 isDir: false
@@ -98,7 +104,7 @@ export async function listFiles(request: DirInfoParamsType): Promise<DirItemType
     }
 }
 
-export async function listSubDirs(request: DirInfoParamsType): Promise<DirItemType[]> {
+async function listSubDirs(request: DirInfoParamsType): Promise<DirItemType[]> {
     try {
         var data: DirItemType[] = [];
         var response = await fetch(request.url);
@@ -124,9 +130,9 @@ export async function listSubDirs(request: DirInfoParamsType): Promise<DirItemTy
                 return;
             }
             data.push({
-                pathString: itemStr,
+                pathString: request.url + itemStr,
                 linkString: '/' + nameStr,
-                name: nameStr,
+                title: nameStr,
                 externsion: "",
                 isDir: true
             })
@@ -139,3 +145,5 @@ export async function listSubDirs(request: DirInfoParamsType): Promise<DirItemTy
         throw err;
     }
 }
+
+export { listDirItems, listFiles, listSubDirs, filterCategoryItems };

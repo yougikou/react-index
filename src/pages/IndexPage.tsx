@@ -53,7 +53,7 @@ class IndexPage extends React.Component<PropsType, StateType> {
             header={<h1>Directories</h1>}
             bordered
             dataSource={items}
-            renderItem={item => <List.Item>{item.name}</List.Item>}
+            renderItem={item => <List.Item>{item.title}</List.Item>}
           />
           </div>
         </Content>

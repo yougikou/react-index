@@ -3,12 +3,19 @@ export interface CategoryType {
   filterStr: string;
   iconStr?: string;
   linkPath?: string;
+  subCategoryStr?: string;
+}
+
+export interface FolderTypeSetting {
+  path: string;
+  type: string;
 }
 
 export interface SettingDataType {
   rootUrl: string;
   scriptUrl: string;
   categories: CategoryType[];
+  folderSettings: FolderTypeSetting[];
 }
 
 const basicSettingKey = "setting-basic";
@@ -19,6 +26,7 @@ export function getSettings(): SettingDataType {
     rootUrl: "",
     scriptUrl: "",
     categories: [],
+    folderSettings: []
   };
 
   // 获取既有设定数据，合并入设定数据模型
