@@ -63,7 +63,7 @@ function CardItem(props: CardItemPropsType) {
         <Card 
           size="small" 
           title={ props.title } 
-          extra={ <Link to={ props.title } target="_blank">開く</Link> }
+          extra={ <Link to={ props.title }>開く</Link> }
           style={{ width: 250 }}>
           // TODO add description implementation
         </Card>

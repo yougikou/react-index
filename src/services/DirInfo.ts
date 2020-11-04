@@ -43,7 +43,7 @@ async function listDirItems(request: DirInfoParamsType): Promise<DirItemType[]> 
             data.push({
                 title: nameStr,
                 pathString: request.url + itemStr,
-                linkString: '/' + nameStr,
+                linkString: nameStr,
                 // file start with . not consider it has extension
                 externsion: nameStr.lastIndexOf(".") > 0 ? nameStr.substring(nameStr.lastIndexOf(".")) : "",
                 isDir: itemStr.indexOf("/") > 0 || itemStr === "Parent Directory"
@@ -88,7 +88,7 @@ async function listFiles(request: DirInfoParamsType): Promise<DirItemType[]> {
             }
             data.push({
                 pathString: request.url + itemStr,
-                linkString: '/' + nameStr,
+                linkString: nameStr,
                 title: nameStr,
                 // file start with . not consider it has extension
                 externsion: extStr,
@@ -131,7 +131,7 @@ async function listSubDirs(request: DirInfoParamsType): Promise<DirItemType[]> {
             }
             data.push({
                 pathString: request.url + itemStr,
-                linkString: '/' + nameStr,
+                linkString: nameStr,
                 title: nameStr,
                 externsion: "",
                 isDir: true

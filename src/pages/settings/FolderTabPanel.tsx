@@ -167,5 +167,4 @@ export class FolderTabPanel extends React.Component<any, StateType> {
     </div>
     );
   }
-
 }
