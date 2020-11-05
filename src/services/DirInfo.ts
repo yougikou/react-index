@@ -146,4 +146,16 @@ async function listSubDirs(request: DirInfoParamsType): Promise<DirItemType[]> {
     }
 }
 
-export { listDirItems, listFiles, listSubDirs, filterCategoryItems };
+async function retrieveFileContentInText(url: string): Promise<string> {
+    try {
+        var response = await fetch(url);
+        var html = await response.text();
+        return html;
+    }
+    catch (err) {
+        console.log('fetch failed', err);
+        throw err;
+    }
+}
+
+export { listDirItems, listFiles, listSubDirs, filterCategoryItems, retrieveFileContentInText };

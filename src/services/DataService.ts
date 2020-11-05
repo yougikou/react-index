@@ -1,3 +1,10 @@
+export enum ContentType {
+  IMAGE = 'Image',
+  SWITCH_IMAGE = 'Switch image',
+  MARKDOWN = 'Mark down',
+  TEXT = 'Text'
+}
+
 export interface CategoryType {
   name: string;
   filterStr: string;
@@ -8,7 +15,7 @@ export interface CategoryType {
 
 export interface FolderTypeSetting {
   path: string;
-  type: string;
+  type: ContentType;
 }
 
 export interface SettingDataType {

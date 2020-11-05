@@ -54,6 +54,7 @@ function SideMenu(props: SideMenuPropsType) {
 
 export interface CardItemPropsType {
   title: string;
+  category: string;
 }
 
 function CardItem(props: CardItemPropsType) {
@@ -63,7 +64,7 @@ function CardItem(props: CardItemPropsType) {
         <Card 
           size="small" 
           title={ props.title } 
-          extra={ <Link to={ props.title }>開く</Link> }
+          extra={ <Link to={ props.title + "/" + props.category }>開く</Link> }
           style={{ width: 250 }}>
           // TODO add description implementation
         </Card>
@@ -74,6 +75,7 @@ function CardItem(props: CardItemPropsType) {
 
 export interface GridLayoutPropsType {
   items: DirItemType[];
+  category: string;
 }
 
 function GridLayout(props: GridLayoutPropsType) {
@@ -82,7 +84,7 @@ function GridLayout(props: GridLayoutPropsType) {
     return (
       <Col key={ _index }>
         <CardItem 
-          title={ _item.title } 
+          title={ _item.title } category={props.category} 
         />
       </Col>
     );

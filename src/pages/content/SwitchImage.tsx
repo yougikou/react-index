@@ -1,12 +1,10 @@
 import React from 'react';
-import { Layout, Carousel, Typography, Pagination, Row, Col, Button } from 'antd';
-import { listFiles, DirItemType } from '../services/DirInfo'
-import "./css/pages.css";
+import { Carousel, Typography, Pagination, Row, Col, Button } from 'antd';
+import { listFiles, DirItemType } from '../../services/DirInfo'
 
 class ImageSwtichSection extends React.Component<any, any> {
   constructor(props : Readonly<any>) {
     super(props);
-    
     this.state = {
       link: props.link,
       replaceLink: props.replaceLink,
@@ -23,7 +21,6 @@ class ImageSwtichSection extends React.Component<any, any> {
     }
     return null;
   }
-
   
   imageClicked() {
     this.setState({
@@ -46,14 +43,16 @@ class ImageSwtichSection extends React.Component<any, any> {
   }
 }
 
-class SwtichImagePage extends React.Component<any, any> {
+interface PropsType {
+  url: string;
+}
+
+class SwtichImage extends React.Component<PropsType, any> {
   carousel: any;
 
-  constructor(props : Readonly<any>) {
+  constructor(props : Readonly<PropsType>) {
     super(props);
     this.state = {
-      url: props.url,
-      title: props.title,
       items: [],
       isLoading: true,
       current: 1,
@@ -63,7 +62,7 @@ class SwtichImagePage extends React.Component<any, any> {
 
   componentDidMount() {
     listFiles({
-      url: this.state.url + "blank/",
+      url: this.props.url + "blank/",
       showParent: false,
     }).then((items: DirItemType[])=> {
       this.setState({
@@ -73,20 +72,22 @@ class SwtichImagePage extends React.Component<any, any> {
     });
   }
   
-  toggleCollapsed = () => {
-    this.setState({
-      collapsed: !this.state.collapsed,
-    });
-  };
-
   render() {
     const { Title } = Typography;
-    const { Header, Content } = Layout;
     const { items, isLoading, current, scale } = this.state;
     if (isLoading) {
       return (
         <div>
           <Title>Page initializing...</Title>
+        </div>
+      );
+    }
+    if (items === undefined || items === null || items.length === 0) {
+      return (
+        <div>
+          <Title>Introduction</Title>
+          Please place two folder "blank", "filled" under the main folder.
+          Swtich image should have the same name in the both folders.
         </div>
       );
     }
@@ -99,12 +100,7 @@ class SwtichImagePage extends React.Component<any, any> {
       slidesToScroll: 1
     }; 
     return(
-      <Layout className="site-layout">
-        <Header className="site-layout-header">
-          <Title level={2}>{this.props.title}</Title>
-        </Header>
-        <Content className="site-layout-content">
-        <div className="site-layout-content-div">
+        <div>
           <Row>
             <Col>
               <Pagination 
@@ -116,13 +112,14 @@ class SwtichImagePage extends React.Component<any, any> {
             </Col>
             <Col>
               <Button type="primary" 
-                onClick={()=>{this.setState({scale: scale === 100 ? 60 : 100})}}> 
+                onClick={()=>{this.setState({scale: scale === 100 ? 72 : 100})}}> 
                 { scale === 100 ? "100% Width" : "100% Height" } 
               </Button>
             </Col>
           </Row>
-          <Carousel ref={ carousel => (this.carousel = carousel) }
-            dotPosition="bottom" 
+          <Carousel ref={ carousel => (this.carousel = carousel)}
+            dotPosition="bottom"
+            style={{ paddingTop: 10 }} 
             afterChange={(current: any) => {this.setState({current: current + 1})}}
             {...settings}>
             {items.map((item: DirItemType, index: any) => {
@@ -136,10 +133,8 @@ class SwtichImagePage extends React.Component<any, any> {
             })}
           </Carousel>
         </div>
-        </Content>
-      </Layout>
     );
   }
 }
 
-export default SwtichImagePage;
+export default SwtichImage;

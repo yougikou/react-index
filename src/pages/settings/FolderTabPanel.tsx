@@ -1,21 +1,14 @@
 import React from 'react';
 import { message, Divider, Button, Select, List, AutoComplete } from 'antd';
 import { listSubDirs, DirItemType } from "../../services/DirInfo";
-import { getSettings, saveSettings, FolderTypeSetting } from "../../services/DataService";
+import { getSettings, saveSettings, FolderTypeSetting, ContentType } from "../../services/DataService";
 import "../css/pages.css";
-
-const FolderType = {
-    IMAGE: 'Image',
-    SWITCH_IMAGE: 'Switch image',
-    MARKDOWN: 'Mark down',
-    TEXT: 'Text'
-}
 
 interface StateType {
   options: {value: string}[];
   filteredOptions: {value: string}[];
   level: number;
-  selectedType: string;
+  selectedType?: ContentType;
   inputFolderPath: string;
   folderSettings: FolderTypeSetting[];
 }
@@ -29,7 +22,7 @@ export class FolderTabPanel extends React.Component<any, StateType> {
         filteredOptions: [],
         level: 0,
         inputFolderPath: "",
-        selectedType: "",
+        selectedType: undefined,
         folderSettings: []
     };
   }
@@ -80,7 +73,7 @@ export class FolderTabPanel extends React.Component<any, StateType> {
     // clear current setting
     let settings = [...this.state.folderSettings.filter(item => item.path !== inputFolderPath)];
 
-    if (selectedType !== null && selectedType.length > 0) {
+    if (selectedType !== undefined) {
       // add new setting    
       settings = settings.concat({
         path: inputFolderPath,
@@ -127,41 +120,41 @@ export class FolderTabPanel extends React.Component<any, StateType> {
         style={{ width: 120, marginLeft:5 }}
         onSelect={this.onSelect.bind(this)}
         options={[
-          {value: FolderType.SWITCH_IMAGE},
-          {value: FolderType.MARKDOWN},
-          {value: FolderType.IMAGE},
-          {value: FolderType.TEXT}]}
+          {value: ContentType.SWITCH_IMAGE},
+          {value: ContentType.MARKDOWN},
+          {value: ContentType.IMAGE},
+          {value: ContentType.TEXT}]}
       />
       <Button onClick={this.addFolderSetting.bind(this)} type="primary" style={{ marginLeft:10 }}>
         Add
       </Button>
       <Button onClick={this.onFinish.bind(this)} type="primary" style={{ marginLeft:5 }}>Save</Button>
-      <Divider orientation="left">{FolderType.SWITCH_IMAGE}</Divider>
+      <Divider orientation="left">{ContentType.SWITCH_IMAGE}</Divider>
       <List
         size="small"
         bordered
-        dataSource={listTypedItems(FolderType.SWITCH_IMAGE)}
+        dataSource={listTypedItems(ContentType.SWITCH_IMAGE)}
         renderItem={item => <List.Item>{item}</List.Item>}
       />
-      <Divider orientation="left">{FolderType.MARKDOWN}</Divider>
+      <Divider orientation="left">{ContentType.MARKDOWN}</Divider>
       <List
         size="small"
         bordered
-        dataSource={listTypedItems(FolderType.MARKDOWN)}
+        dataSource={listTypedItems(ContentType.MARKDOWN)}
         renderItem={item => <List.Item>{item}</List.Item>}
       />
-      <Divider orientation="left">{FolderType.IMAGE}</Divider>
+      <Divider orientation="left">{ContentType.IMAGE}</Divider>
       <List
         size="small"
         bordered
-        dataSource={listTypedItems(FolderType.IMAGE)}
+        dataSource={listTypedItems(ContentType.IMAGE)}
         renderItem={item => <List.Item>{item}</List.Item>}
       />
-      <Divider orientation="left">{FolderType.TEXT}</Divider>
+      <Divider orientation="left">{ContentType.TEXT}</Divider>
       <List
         size="small"
         bordered
-        dataSource={listTypedItems(FolderType.TEXT)}
+        dataSource={listTypedItems(ContentType.TEXT)}
         renderItem={item => <List.Item>{item}</List.Item>}
       />
     </div>

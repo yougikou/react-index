@@ -2,19 +2,11 @@ import React from 'react';
 import { HashRouter, Route } from "react-router-dom";
 import { Layout } from 'antd';
 import { SideMenu } from "./components/LayoutWidgets";
-import IndexPage from "./pages/IndexPage";
-import CollapsableCatePage from "./pages/CollapsableCatePage";
-import SwitchImagePage from "./pages/SwitchImagePage";
+import { IndexPage, CollapsablePage } from "./pages/IndexPage";
 import Settings from "./pages/settings";
+import Content from "./pages/content";
 import { getSettings, getCategories, CategoryType } from "./services/DataService";
 import { listSubDirs, DirItemType } from "./services/DirInfo";
-
-const FolderType = {
-    IMAGE: 'Image',
-    SWITCH_IMAGE: 'Switch image',
-    MARKDOWN: 'Mark down',
-    TEXT: 'Text'
-}
 
 interface StateType {
   rootUrl: string;
@@ -64,7 +56,7 @@ class App extends React.Component<any, StateType> {
               if (_item.subCategoryStr && _item.subCategoryStr.length > 0) {
                 return (
                   <Route path={_item.linkPath} key={_index}>
-                    <CollapsableCatePage url={rootUrl} category={_item} />
+                    <CollapsablePage url={rootUrl} category={_item} />
                   </Route>
                 );
               } else {
@@ -80,35 +72,19 @@ class App extends React.Component<any, StateType> {
               if (idx < 0 ) {
                 return(
                   // text page
-                  <Route path={"/" + _item.linkString} component={Settings} key={_item.linkString} />
+                  <Route path={"/" + _item.linkString} key={_item.linkString} />
                 );
               }
               let type = folderSettings[idx].type;
-              switch (type) {
-                case FolderType.SWITCH_IMAGE:
-                  return(
-                    // text page
-                    <Route path={"/" + _item.linkString} key={_item.linkString}>
-                      <SwitchImagePage key={_index} url={ _item.pathString } title={ _item.title }/>
-                    </Route>
-                  );
-                case FolderType.MARKDOWN:
-                  return(
-                    // text page
-                    <Route path={_item.linkString} component={Settings} key={_item.linkString} />
-                  );
-                case FolderType.IMAGE:
-                  return(
-                    // text page
-                    <Route path={_item.linkString} component={Settings} key={_item.linkString} />
-                  );
-                case FolderType.TEXT:
-                default:
-                  return(
-                    // text page
-                    <Route path={_item.linkString} component={Settings} key={_item.linkString} />
-                  );
-              }
+              return(
+                // text page
+                <Route path={"/" + _item.linkString} key={_item.linkString}>
+                  <Content key={_index} 
+                    title={ _item.title } 
+                    url={ _item.pathString } 
+                    type={ type }/>
+                </Route>
+              );
             })}
             <Route path="/setting" component={Settings} key="setting" />
             <Footer style={{ textAlign: 'center' }}>Ant Design ©2018 Created by Ant UED</Footer>
