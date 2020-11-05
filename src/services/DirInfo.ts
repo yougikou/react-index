@@ -2,17 +2,24 @@ export interface DirInfoParamsType {
     url: string;
     showParent?: boolean;
     extension?: string[];
+    filterStr?: string;
 }
 
 export interface DirItemType {
+    key?: string;
+    title: string;
     pathString: string;
     linkString: string;
-    name: string;
     externsion: string;
     isDir: boolean;
+    children?: DirItemType[];
 }
 
-export async function listDirItems(request: DirInfoParamsType): Promise<DirItemType[]> {
+function filterCategoryItems(items: Array<DirItemType>,cateFilter: string): Array<DirItemType> {
+    return items.filter((item) => {return item.title.indexOf(cateFilter) >= 0})
+}
+
+async function listDirItems(request: DirInfoParamsType): Promise<DirItemType[]> {
     try {
         var data: DirItemType[] = [];
         var response = await fetch(request.url);
@@ -29,10 +36,14 @@ export async function listDirItems(request: DirInfoParamsType): Promise<DirItemT
         items.forEach((item) => {
             let itemStr = item.innerText.trim();
             let nameStr = itemStr.replace("/", "")
+            if (request.filterStr !== undefined && request.filterStr.length > 0 &&
+                itemStr !== "Parent Directory" && itemStr.indexOf(request.filterStr) < 0 ) {
+                return;
+            }
             data.push({
-                pathString: itemStr,
-                linkString: '/' + nameStr,
-                name: nameStr,
+                title: nameStr,
+                pathString: request.url + itemStr,
+                linkString: nameStr,
                 // file start with . not consider it has extension
                 externsion: nameStr.lastIndexOf(".") > 0 ? nameStr.substring(nameStr.lastIndexOf(".")) : "",
                 isDir: itemStr.indexOf("/") > 0 || itemStr === "Parent Directory"
@@ -47,7 +58,7 @@ export async function listDirItems(request: DirInfoParamsType): Promise<DirItemT
     }
 }
 
-export async function listFiles(request: DirInfoParamsType): Promise<DirItemType[]> {
+async function listFiles(request: DirInfoParamsType): Promise<DirItemType[]> {
     try {
         var data: DirItemType[] = [];
         var response = await fetch(request.url);
@@ -71,10 +82,14 @@ export async function listFiles(request: DirInfoParamsType): Promise<DirItemType
                 request.extension.length > 0 && !request.extension.includes(extStr)) {
                 return;
             }
+            if (request.filterStr !== undefined && request.filterStr.length > 0 &&
+                itemStr !== "Parent Directory" && itemStr.indexOf(request.filterStr) < 0 ) {
+                return;
+            }
             data.push({
-                pathString: itemStr,
-                linkString: '/' + nameStr,
-                name: nameStr,
+                pathString: request.url + itemStr,
+                linkString: nameStr,
+                title: nameStr,
                 // file start with . not consider it has extension
                 externsion: extStr,
                 isDir: false
@@ -89,7 +104,7 @@ export async function listFiles(request: DirInfoParamsType): Promise<DirItemType
     }
 }
 
-export async function listSubDirs(request: DirInfoParamsType): Promise<DirItemType[]> {
+async function listSubDirs(request: DirInfoParamsType): Promise<DirItemType[]> {
     try {
         var data: DirItemType[] = [];
         var response = await fetch(request.url);
@@ -97,6 +112,11 @@ export async function listSubDirs(request: DirInfoParamsType): Promise<DirItemTy
         var temp = document.createElement("temp");
         temp.innerHTML = html;
         var items = Array.from(temp.getElementsByTagName("a"));
+        if (!request.showParent) {
+            items = items.filter((item) => {
+                return item.innerText.trim() !== "Parent Directory";
+            });
+        }
 
         items.forEach((item) => {
             let itemStr = item.innerText.trim();
@@ -105,10 +125,14 @@ export async function listSubDirs(request: DirInfoParamsType): Promise<DirItemTy
             if (itemStr.indexOf("/") < 0 && itemStr !== "Parent Directory") {
                 return;
             }
+            if (request.filterStr !== undefined && request.filterStr.length > 0 &&
+                itemStr !== "Parent Directory" && itemStr.indexOf(request.filterStr) < 0 ) {
+                return;
+            }
             data.push({
-                pathString: itemStr,
-                linkString: '/' + nameStr,
-                name: nameStr,
+                pathString: request.url + itemStr,
+                linkString: nameStr,
+                title: nameStr,
                 externsion: "",
                 isDir: true
             })
@@ -121,3 +145,17 @@ export async function listSubDirs(request: DirInfoParamsType): Promise<DirItemTy
         throw err;
     }
 }
+
+async function retrieveFileContentInText(url: string): Promise<string> {
+    try {
+        var response = await fetch(url);
+        var html = await response.text();
+        return html;
+    }
+    catch (err) {
+        console.log('fetch failed', err);
+        throw err;
+    }
+}
+
+export { listDirItems, listFiles, listSubDirs, filterCategoryItems, retrieveFileContentInText };

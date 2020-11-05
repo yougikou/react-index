@@ -3,12 +3,22 @@
   padding: 6px 0px 0px 20px;
 }
 
+.site-layout .site-layout-header-small {
+  background: #fff;
+  padding: 3px 0px 0px 6px;
+  height: 30px;
+}
+
 .site-layout .site-layout-content {
   margin: 16px 16px;
 }
 
+.site-layout .site-layout-content-small {
+  margin: 2px 0px;
+}
+
 .site-layout .site-layout-content-div {
   background: #fff;
-  padding: 24px;
+  padding: 10px;
   min-height: 360px;
 }
