@@ -3,7 +3,7 @@ import { Typography, Layout, Tabs } from 'antd';
 import { BasicTabPanel } from "./BasicTabPanel";
 import { RuleTabPanel } from "./RuleTabPanel";
 import { FolderTabPanel } from "./FolderTabPanel";
-import "../css/pages.css";
+import "../css/Pages.css";
 
 
 class Settings extends React.Component<any, any> {

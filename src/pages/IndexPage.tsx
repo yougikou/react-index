@@ -3,8 +3,8 @@ import { Typography, Layout, Collapse, List } from 'antd';
 import { CaretRightOutlined } from '@ant-design/icons';
 import { CategoryType } from "../services/DataService";
 import { listSubDirs, filterCategoryItems, DirItemType } from "../services/DirInfo";
-import { GridLayout, GroupType } from "../components/LayoutWidgets";
-import "./css/pages.css";
+import { GridLayout } from "../components/LayoutWidgets";
+import "./css/Pages.css";
 
 interface IndexPagePropsType {
   url: string;
@@ -98,14 +98,15 @@ class CollapsablePage extends React.Component<CollapsablePagePropsType, Collapsa
     const { category } = this.props;
     const { items } = this.state;
     let subCategories = category.subCategoryStr?.split(",");
-    let groups: GroupType[] = [];
+    let content;
     if (subCategories && subCategories.length > 0) {
-      subCategories.forEach((_subCate: string, _index: number) => {
-        groups.push({
-          subCate: _subCate,
-          items: filterCategoryItems(items, _subCate)
-        })
+      content = subCategories.map((_subCate: string, _index: number) => {
+        return (<Panel header={_subCate} key={_index}>
+          <GridLayout items={filterCategoryItems(items, _subCate)} category={category.name}/>
+        </Panel>)
       })
+    } else {
+      content = <div style={{paddingLeft:10}}><GridLayout items={items} category={category.name}/></div>
     }
 
     return(
@@ -119,13 +120,7 @@ class CollapsablePage extends React.Component<CollapsablePagePropsType, Collapsa
             defaultActiveKey={[]}
             expandIcon={({ isActive }) => <CaretRightOutlined rotate={isActive ? 90 : 0} />}
             className="site-collapse-custom-collapse">
-              {groups.map((_group: GroupType, _index: number) => {
-                return(
-                  <Panel header={_group.subCate} key={_index}>
-                    <GridLayout items={_group.items} category={category.name}/>
-                  </Panel>
-                );
-              })}
+              {content}
           </Collapse>
           </div>
         </Content>

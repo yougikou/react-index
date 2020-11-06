@@ -3,7 +3,7 @@ import { Typography, Layout } from 'antd';
 import SwtichImage from "./SwitchImage";
 import Markdown from "./Markdown";
 import { ContentType } from "../../services/DataService";
-import "../css/pages.css";
+import "../css/Pages.css";
 
 interface PropsType {
   title: string;

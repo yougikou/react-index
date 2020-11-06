@@ -1,7 +1,7 @@
 import React from 'react';
 import { message, Input, Button } from 'antd';
 import { getSettings, saveSettings } from "../../services/DataService";
-import "../css/pages.css";
+import "../css/Pages.css";
 
 interface StateType {
   rootUrl: string;

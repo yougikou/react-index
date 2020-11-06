@@ -53,7 +53,7 @@ class App extends React.Component<any, StateType> {
           <SideMenu scriptUrl={scriptUrl} categories={categories}/>
           <Layout>
             {categories.map((_item: CategoryType, _index: number) => {
-              if (_item.subCategoryStr && _item.subCategoryStr.length > 0) {
+              if (_item.filterStr !== null && _item.filterStr.length > 0) {
                 return (
                   <Route path={_item.linkPath} key={_index}>
                     <CollapsablePage url={rootUrl} category={_item} />

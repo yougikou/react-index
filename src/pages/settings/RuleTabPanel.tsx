@@ -1,7 +1,7 @@
 import React from 'react';
 import { message, Table, Input, Button } from 'antd';
 import { getSettings, saveSettings, CategoryType } from "../../services/DataService";
-import "../css/pages.css";
+import "../css/Pages.css";
 
 interface CategoryViewType {
   key?: number;

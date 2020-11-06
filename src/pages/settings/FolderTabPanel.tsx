@@ -2,7 +2,7 @@ import React from 'react';
 import { message, Divider, Button, Select, List, AutoComplete } from 'antd';
 import { listSubDirs, DirItemType } from "../../services/DirInfo";
 import { getSettings, saveSettings, FolderTypeSetting, ContentType } from "../../services/DataService";
-import "../css/pages.css";
+import "../css/Pages.css";
 
 interface StateType {
   options: {value: string}[];
