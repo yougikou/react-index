@@ -33,7 +33,7 @@ function SideMenu(props: SideMenuPropsType) {
     <HashRouter>
       <Sider collapsible collapsed={collapsed} onCollapse={() => setCollapsed(!collapsed)}>
         <div className="logo" />
-        <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']}>
+        <Menu theme="dark" mode="inline">
           {props.categories.map((item: CategoryType, index: any) => {
               return(
                 <Menu.Item 
