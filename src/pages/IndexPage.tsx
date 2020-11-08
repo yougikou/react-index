@@ -92,14 +92,14 @@ class CollapsablePage extends React.Component<CollapsablePagePropsType, Collapsa
   }
 
   render() {
-    const { Title } = Typography;
     const { Header, Content } = Layout;
+    const { Title } = Typography;
     const { Panel } = Collapse;
     const { category } = this.props;
     const { items } = this.state;
     let subCategories = category.subCategoryStr?.split(",");
     let content;
-    if (subCategories && subCategories.length > 0) {
+    if (category.subCategoryStr && subCategories && subCategories.length > 0) {
       content = subCategories.map((_subCate: string, _index: number) => {
         return (<Panel header={_subCate} key={_index}>
           <GridLayout items={filterCategoryItems(items, _subCate)} category={category.name}/>

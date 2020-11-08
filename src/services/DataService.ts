@@ -21,6 +21,7 @@ export interface FolderTypeSetting {
 export interface SettingDataType {
   rootUrl: string;
   scriptUrl: string;
+  showUncategorized: boolean;
   categories: CategoryType[];
   folderSettings: FolderTypeSetting[];
 }
@@ -32,6 +33,7 @@ export function getSettings(): SettingDataType {
   let settingObj: SettingDataType = {
     rootUrl: "",
     scriptUrl: "",
+    showUncategorized: false,
     categories: [],
     folderSettings: []
   };
@@ -56,7 +58,7 @@ export function saveSettings(obj: any) : void{
 }
 
 export function getCategories():CategoryType[] {
-  const {rootUrl, categories} = getSettings();
+  const {rootUrl, categories, showUncategorized} = getSettings();
   // index url未设定时，返回空分类 - 不显示菜单
   let tmp: CategoryType[] = []
   if (rootUrl.length === 0) {
@@ -72,7 +74,7 @@ export function getCategories():CategoryType[] {
     });
   }
 
-  if (true) {
+  if (showUncategorized) {
     tmp = tmp.concat({
       name: "uncategoried", 
       filterStr: "",

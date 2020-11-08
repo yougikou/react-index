@@ -3,6 +3,7 @@ import { HashRouter, Link } from "react-router-dom";
 import { Menu, Layout, Row, Col, Card } from 'antd';
 import {
   SettingOutlined,
+  ContainerOutlined,
   createFromIconfontCN,
 } from '@ant-design/icons';
 import { CategoryType } from "../services/DataService";
@@ -38,7 +39,7 @@ function SideMenu(props: SideMenuPropsType) {
               return(
                 <Menu.Item 
                   key={index} 
-                  icon={<IconFont type={ item.iconStr?item.iconStr:"empty" } />}>
+                  icon={item.iconStr ? <IconFont type={ item.iconStr } /> : <ContainerOutlined />}>
                   <Link to={ item.linkPath?item.linkPath:"empty" }>{item.name}</Link>
                 </Menu.Item>
               );

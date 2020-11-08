@@ -1,54 +1,55 @@
 import React from 'react';
-import { message, Input, Button } from 'antd';
+import { message, Form, Input, Button, Switch } from 'antd';
 import { getSettings, saveSettings } from "../../services/DataService";
 import "../css/Pages.css";
 
-interface StateType {
-  rootUrl: string;
-  scriptUrl: string;
-}
-
-export class BasicTabPanel extends React.Component<any, StateType> {
-
+export class BasicTabPanel extends React.Component<any, any> {
   constructor(props: Readonly<any>) {
     super(props);
     this.state = {
-      rootUrl: "",
-      scriptUrl: "",
+      settings: null,
+      isLoading: true,
     };
   }
 
   componentDidMount(){
-    const {rootUrl, scriptUrl} = getSettings();
+    const settings = getSettings();
     this.setState({
-      rootUrl: rootUrl,
-      scriptUrl: scriptUrl
+      settings: settings,
+      isLoading: false
     })
   }
 
-  handleChange(e: any, key: string) {
-    let field: any = {};
-    field[key] = e.target.value;
-    this.setState({...field});
-  }
-
-  onFinish() {
-    saveSettings(this.state);
+  onFinish(values : any) {
+    saveSettings(values);
     message.success("Root url setting saved.");
     window.location.reload(false);
   }
 
   render() {
-    const { rootUrl, scriptUrl } = this.state;
-    return(
-      <div>
-        <Input addonBefore="Root Url: " value={rootUrl} onChange={(e)=> this.handleChange(e, "rootUrl")}/>
-        <p/>
-        <Input addonBefore="Iconfont Script Url: " value={scriptUrl} onChange={(e)=> this.handleChange(e, "scriptUrl")}/>
-        <Button type="primary" style={{ marginTop: 16 }} onClick={()=> this.onFinish()}>
-          Save
-        </Button>
-      </div>
-    );
+    const { settings, isLoading } = this.state;
+    if (isLoading) {
+      return <div></div>
+    } else {
+      return(
+        <Form 
+          size="small" 
+          onFinish={this.onFinish.bind(this)}
+          initialValues={settings}>
+          <Form.Item label="Root Url" name="rootUrl">
+            <Input />
+          </Form.Item>
+          <Form.Item label="Iconfont Script Url" name="scriptUrl">
+            <Input />
+          </Form.Item>
+          <Form.Item label="Show Uncategorized Page" name="showUncategorized">
+            <Switch defaultChecked={settings.showUncategorized}/>
+          </Form.Item>
+          <Form.Item>
+            <Button type="primary" htmlType="submit">Save</Button>
+          </Form.Item>
+        </Form>
+      );
+    }
   }
 }
