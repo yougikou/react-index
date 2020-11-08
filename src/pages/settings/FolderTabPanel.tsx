@@ -95,6 +95,7 @@ export class FolderTabPanel extends React.Component<any, StateType> {
     const { folderSettings } = this.state;
     saveSettings({folderSettings : folderSettings});
     message.success("Folder type settings saved.");
+    window.location.reload();
   }
 
   render() {
