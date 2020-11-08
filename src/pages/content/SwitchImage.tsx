@@ -63,6 +63,7 @@ class SwtichImage extends React.Component<PropsType, any> {
   componentDidMount() {
     listFiles({
       url: this.props.url + "blank/",
+      filterStr: ".png,.jpg,.jpeg",
       showParent: false,
     }).then((items: DirItemType[])=> {
       this.setState({
@@ -95,7 +96,6 @@ class SwtichImage extends React.Component<PropsType, any> {
       dots: true,
       infinite: true,
       speed: 500,
-      appendDots: (dots: any) => <ul>test</ul>,
       slidesToShow: 1,
       slidesToScroll: 1
     }; 

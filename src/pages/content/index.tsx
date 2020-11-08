@@ -1,25 +1,14 @@
 import React from 'react';
-import { Typography, Layout } from 'antd';
+import { Breadcrumb, Layout } from 'antd';
+import { HashRouter, Link } from "react-router-dom";
 import SwtichImage from "./SwitchImage";
 import Markdown from "./Markdown";
-import { ContentType } from "../../services/DataService";
+import { getCategories, ContentType } from "../../services/DataService";
 import "../css/Pages.css";
 
-interface PropsType {
-  title: string;
-  url: string;
-  type: ContentType;
-}
+class Content extends React.Component<any, any> {
 
-interface StateType {
-  title: string;
-  url: string;
-  type: ContentType;
-}
-
-class Content extends React.Component<PropsType, any> {
-
-  constructor(props: PropsType) {
+  constructor(props: Readonly<any>) {
     super(props);
     this.state = {
       title: props.title,
@@ -30,18 +19,40 @@ class Content extends React.Component<PropsType, any> {
 
   render() {
     const { Header, Content } = Layout;
-    const { Title } = Typography;
     const { title, url, type } = this.state;
+    const category = getCategories().find(elt => elt.name === this.props.match.params.category);
+    if (!type) {
+      return <div></div>
+    }
+    let content;
+    switch (type) {
+      case ContentType.SWITCH_IMAGE:
+        content = <SwtichImage url={url}/>;
+        break;
+      case ContentType.MARKDOWN:
+        content = <Markdown url={url}/>;
+        break;
+      case ContentType.IMAGE:
+      case ContentType.TEXT:
+      default:
+        content = <div></div>;
+        break;
+    }
+
     return(
       <Layout className="site-layout">
         <Header className="site-layout-header-small">
-          <Title level={5}>{title}</Title>
+          <Breadcrumb style={{paddingLeft:6}}>
+            <Breadcrumb.Item>
+              <HashRouter>
+                <Link to={ category?.linkPath ? category?.linkPath : "#" }>{category?.name}</Link>
+              </HashRouter>
+            </Breadcrumb.Item>
+            <Breadcrumb.Item>{title}</Breadcrumb.Item>
+          </Breadcrumb>
         </Header>
         <Content className="site-layout-content">
-          { type === ContentType.SWITCH_IMAGE ? <SwtichImage url={url}/> : "" }
-          { type === ContentType.MARKDOWN ? <Markdown url={url}/> : "" }
-          { type === ContentType.IMAGE ? <div></div>:"" }
-          { type === ContentType.TEXT ? <div></div>:"" }
+          {content}
         </Content>
       </Layout>
     );

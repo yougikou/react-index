@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { HashRouter, Link } from "react-router-dom";
-import { Menu, Layout, Row, Col, Card } from 'antd';
+import { Typography, Menu, Layout, Row, Col, Card } from 'antd';
 import {
   SettingOutlined,
   ContainerOutlined,
@@ -21,26 +21,30 @@ export interface GroupType {
 }
 
 function SideMenu(props: SideMenuPropsType) {
-
   const [collapsed, setCollapsed] = useState(Boolean);
   const { Sider } = Layout;
+  const { Title } = Typography;
   const IconFont = createFromIconfontCN({
     scriptUrl: [
       props.scriptUrl
     ],
   });
 
+  let logo = collapsed ? 
+    <Title level={3} style={{textAlign: 'center', color: "white"}}>R.I.</Title> :
+    <Title level={3} style={{textAlign: 'center', color: "white"}}>React Index</Title>;
+
   return (
     <HashRouter>
       <Sider collapsible collapsed={collapsed} onCollapse={() => setCollapsed(!collapsed)}>
-        <div className="logo" />
+        <div className="logo">{logo}</div>
         <Menu theme="dark" mode="inline">
           {props.categories.map((item: CategoryType, index: any) => {
               return(
                 <Menu.Item 
                   key={index} 
                   icon={item.iconStr ? <IconFont type={ item.iconStr } /> : <ContainerOutlined />}>
-                  <Link to={ item.linkPath?item.linkPath:"empty" }>{item.name}</Link>
+                  <Link to={ item.linkPath ? item.linkPath:"#" }>{item.name}</Link>
                 </Menu.Item>
               );
           })}
@@ -59,15 +63,15 @@ export interface CardItemPropsType {
 }
 
 function CardItem(props: CardItemPropsType) {
+  let linkUrl = "/" + props.title + "/" + props.category;
   return(
     <div style={{ padding: '8px 0' }}>
       <HashRouter>
         <Card 
           size="small" 
           title={ props.title } 
-          extra={ <Link to={ props.title + "/" + props.category }>開く</Link> }
+          extra={ <Link to={ linkUrl }>開く</Link> }
           style={{ width: 250 }}>
-          // TODO add description implementation
         </Card>
       </HashRouter>
     </div>

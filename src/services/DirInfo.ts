@@ -83,8 +83,17 @@ async function listFiles(request: DirInfoParamsType): Promise<DirItemType[]> {
                 return;
             }
             if (request.filterStr !== undefined && request.filterStr.length > 0 &&
-                itemStr !== "Parent Directory" && itemStr.indexOf(request.filterStr) < 0 ) {
-                return;
+                itemStr !== "Parent Directory") {
+                let filterKeys = request.filterStr.split(",");
+                let exist = false;
+                for (let index = 0; index < filterKeys.length; index++) {
+                    const element = filterKeys[index];
+                    if (itemStr.indexOf(element) >= 0) {
+                        exist = true;
+                        break;
+                    }
+                }
+                if (!exist) return;
             }
             data.push({
                 pathString: request.url + itemStr,

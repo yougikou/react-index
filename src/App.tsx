@@ -46,7 +46,7 @@ class App extends React.Component<any, StateType> {
   render() {
     const { Footer } = Layout;
     const { folderSettings } = getSettings();
-    const {rootUrl, scriptUrl, categories, items } = this.state;
+    const { rootUrl, scriptUrl, categories, items } = this.state;
     return (
       <HashRouter>
         <Layout style={{ minHeight: '100vh' }}>
@@ -55,38 +55,32 @@ class App extends React.Component<any, StateType> {
             {categories.map((_item: CategoryType, _index: number) => {
               if (_item.filterStr !== null && _item.filterStr.length > 0) {
                 return (
-                  <Route path={_item.linkPath} key={_index}>
-                    <CollapsablePage url={rootUrl} category={_item} />
-                  </Route>
+                  <Route path={_item.linkPath} key={_index}
+                    component={(props : any) => 
+                      <CollapsablePage url={rootUrl} category={_item} />}/>
                 );
               } else {
                 return (
-                  <Route path={_item.linkPath} key={_index}>
-                    <IndexPage url={rootUrl} category={_item} />
-                  </Route>
+                  <Route path={_item.linkPath} key={_index}
+                    component={(props : any) => 
+                      <IndexPage url={rootUrl} category={_item} />}/>
                 );
               }
             })}
             {items.map((_item: DirItemType, _index: number) => {
-              let idx = folderSettings.findIndex(elt => elt.path === _item.linkString);
-              if (idx < 0 ) {
-                return(
-                  // text page
-                  <Route path={"/" + _item.linkString} key={_item.linkString} />
-                );
-              }
-              let type = folderSettings[idx].type;
+              let typeSetting = folderSettings.find(elt => elt.path === _item.linkString);
+              let pathUrl = "/" + _item.linkString + "/:category";
               return(
-                // text page
-                <Route path={"/" + _item.linkString} key={_item.linkString}>
-                  <Content key={_index} 
-                    title={ _item.title } 
-                    url={ _item.pathString } 
-                    type={ type }/>
-                </Route>
+                <Route 
+                  key={pathUrl} path={pathUrl} 
+                  component={(props : any) => 
+                    <Content {...props} 
+                      title={ _item.title } 
+                      url={_item.pathString} 
+                      type={typeSetting?.type} />}/>
               );
             })}
-            <Route path="/setting" component={Settings} key="setting" />
+            <Route path="/setting" component={Settings} key="/setting" />
             <Footer style={{ textAlign: 'center' }}>Ant Design ©2018 Created by Ant UED</Footer>
           </Layout>
         </Layout>
