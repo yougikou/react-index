@@ -1,16 +1,27 @@
 import React from 'react';
-import { message, Divider, Button, Select, List, AutoComplete } from 'antd';
+import { Divider, Button, Select, List, Tree, Row, Col } from 'antd';
 import { listSubDirs, DirItemType } from "../../services/DirInfo";
 import { getSettings, saveSettings, FolderTypeSetting, ContentType } from "../../services/DataService";
 import "../css/Pages.css";
 
+interface FolderTreeNode {
+  title: string;
+  key: string;
+  disabled?: boolean;
+  disableCheckbox?: boolean;
+  checkable?: boolean;
+  isLeaf?: boolean;
+  children: FolderTreeNode[];
+}
+
 interface StateType {
   options: {value: string}[];
-  filteredOptions: {value: string}[];
   level: number;
   selectedType?: ContentType;
-  inputFolderPath: string;
+  inputFolderPaths: string[];
   folderSettings: FolderTypeSetting[];
+  folderTree: FolderTreeNode;
+  version?: number;
 }
 
 export class FolderTabPanel extends React.Component<any, StateType> {
@@ -19,16 +30,24 @@ export class FolderTabPanel extends React.Component<any, StateType> {
     super(props);
     this.state = {
         options: [],
-        filteredOptions: [],
         level: 0,
-        inputFolderPath: "",
+        inputFolderPaths: [],
         selectedType: undefined,
-        folderSettings: []
+        folderSettings: [],
+        folderTree: {
+          title: "Root",
+          key: "",
+          checkable: false,
+          isLeaf: false,
+          children: []
+        },
+        version: 0
     };
   }
 
   componentDidMount(){
     const { rootUrl, folderSettings } = getSettings();
+
     listSubDirs({
       url: rootUrl, 
       showParent: false,
@@ -36,70 +55,68 @@ export class FolderTabPanel extends React.Component<any, StateType> {
       let arrVal = items.map((item : DirItemType) => {
         return { value: item.title };
       });
+
+      let treeNodes = items.map((item : DirItemType) => {
+        return { 
+          title: item.title,
+          key: item.pathString,
+          disabled: false,
+          disableCheckbox: false,
+          isLeaf: true,
+          children: []
+        };
+      });
+
       this.setState({
         options: arrVal, 
-        filteredOptions: arrVal, 
         level: 1,
-        folderSettings: folderSettings});
+        folderSettings: folderSettings,
+        folderTree: {
+          title: "Root",
+          key: rootUrl,
+          checkable: false,
+          isLeaf: false,
+          children: treeNodes
+        }});
     });
   }
 
-  onSearch(searchText: string) {
-    const { rootUrl } = getSettings();
-    const { options, level } = this.state;
-    const searchKeys = searchText.split("/");
-    const searchLevel = searchKeys.length;
-    if (searchLevel !== level) {
-      let queryUrl = searchKeys.slice(0, searchKeys.length - 1).join("/");
-      let url = rootUrl + (queryUrl.length > 0 ? queryUrl + "/" : "");
-      listSubDirs({
-        url: url, 
-        showParent: false,
-      }).then((items: DirItemType[])=> {
-        let arrVal = items.map((item : DirItemType) => {
-          return { value: (queryUrl.length > 0 ? queryUrl + "/" : "") + item.title };
-        });
-        let filtered = arrVal.filter(item => item.value.startsWith(searchText));
-        this.setState({options: arrVal, filteredOptions: filtered, level: searchLevel});
-      });
-    } else {
-      let filtered = [...options.filter(item => item.value.startsWith(searchText))];
-      this.setState({filteredOptions: filtered});
-    }
-  }
-
   addFolderSetting(){
-    const {inputFolderPath, selectedType} = this.state;
-    // clear current setting
-    let settings = [...this.state.folderSettings.filter(item => item.path !== inputFolderPath)];
+    const {inputFolderPaths, selectedType, folderSettings} = this.state;
+    let settings = [...folderSettings];
+    for (let i = 0; i < inputFolderPaths.length; i++) {
+      const path = inputFolderPaths[i];
+      // clear current setting
+      settings = [...settings.filter(item => item.path !== path)];
 
-    if (selectedType !== undefined) {
-      // add new setting    
-      settings = settings.concat({
-        path: inputFolderPath,
-        type: selectedType
-      });
+      if (selectedType !== undefined) {
+        // add new setting    
+        settings = settings.concat({
+          path: path,
+          type: selectedType
+        });
+      }
     }
+
     this.setState({folderSettings : settings});
-  }
-
-  onSelect(value: any){
-    this.setState({selectedType : value})
-  }
-
-  onChange(value: any){
-    this.setState({inputFolderPath : value})
-  }
-
-  onFinish() {
-    const { folderSettings } = this.state;
-    saveSettings({folderSettings : folderSettings});
-    message.success("Folder type settings saved.");
+    saveSettings({folderSettings : settings});
     window.location.reload();
   }
 
+  onTypeSelect(value: any){
+    this.setState({selectedType : value})
+  }
+
+  onPathCheck (checked: React.Key[] | { checked: React.Key[]; halfChecked: React.Key[]; }, info: any) {
+    const {inputFolderPaths} = this.state;
+    if (inputFolderPaths.indexOf(info.node.key) < 0) {
+      let clone = [...inputFolderPaths].concat(info.node.key)
+      this.setState({inputFolderPaths : clone});
+    }
+  }
+
   render() {
-    const { filteredOptions, folderSettings } = this.state;
+    const { folderSettings, folderTree } = this.state;
     const listTypedItems = function (type: any) {
       return folderSettings.filter(item => item.type === type)
         .map((item: FolderTypeSetting) => {
@@ -108,57 +125,62 @@ export class FolderTabPanel extends React.Component<any, StateType> {
     }
 
     return(
-    <div>
-      <AutoComplete
-        options={filteredOptions}
-        style={{ width: 500 }}
-        onSearch={this.onSearch.bind(this)}
-        onSelect={this.onSearch.bind(this)}
-        onChange={this.onChange.bind(this)}
-        placeholder="input path here, use '/' for sub path."
-      />
-      <Select
-        style={{ width: 120, marginLeft:5 }}
-        onSelect={this.onSelect.bind(this)}
-        options={[
-          {value: ContentType.SWITCH_IMAGE},
-          {value: ContentType.MARKDOWN},
-          {value: ContentType.IMAGE},
-          {value: ContentType.TEXT}]}
-      />
-      <Button onClick={this.addFolderSetting.bind(this)} type="primary" style={{ marginLeft:10 }}>
-        Add
-      </Button>
-      <Button onClick={this.onFinish.bind(this)} type="primary" style={{ marginLeft:5 }}>Save</Button>
-      <Divider orientation="left">{ContentType.SWITCH_IMAGE}</Divider>
-      <List
-        size="small"
-        bordered
-        dataSource={listTypedItems(ContentType.SWITCH_IMAGE)}
-        renderItem={item => <List.Item>{item}</List.Item>}
-      />
-      <Divider orientation="left">{ContentType.MARKDOWN}</Divider>
-      <List
-        size="small"
-        bordered
-        dataSource={listTypedItems(ContentType.MARKDOWN)}
-        renderItem={item => <List.Item>{item}</List.Item>}
-      />
-      <Divider orientation="left">{ContentType.IMAGE}</Divider>
-      <List
-        size="small"
-        bordered
-        dataSource={listTypedItems(ContentType.IMAGE)}
-        renderItem={item => <List.Item>{item}</List.Item>}
-      />
-      <Divider orientation="left">{ContentType.TEXT}</Divider>
-      <List
-        size="small"
-        bordered
-        dataSource={listTypedItems(ContentType.TEXT)}
-        renderItem={item => <List.Item>{item}</List.Item>}
-      />
-    </div>
+      <div>    
+        <Select
+          style={{ width: 120, marginLeft:5 }}
+          onSelect={this.onTypeSelect.bind(this)}
+          options={[
+            {value: ContentType.SWITCH_IMAGE},
+            {value: ContentType.MARKDOWN},
+            {value: ContentType.IMAGE},
+            {value: ContentType.TEXT}]}
+        />
+        <Button onClick={this.addFolderSetting.bind(this)} type="primary" style={{ marginLeft:10 }}>
+          Add
+        </Button>
+        <Row>
+          <Col span={12}>
+            <Tree
+              checkable
+              defaultExpandedKeys={['0-0-0', '0-0-1']}
+              defaultSelectedKeys={['0-0-0', '0-0-1']}
+              defaultCheckedKeys={['0-0-0', '0-0-1']}
+              onCheck={this.onPathCheck.bind(this)}
+              treeData={[folderTree]}
+            />
+          </Col>
+          <Col span={12}>
+            <Divider orientation="left">{ContentType.SWITCH_IMAGE}</Divider>
+            <List
+              size="small"
+              bordered
+              dataSource={listTypedItems(ContentType.SWITCH_IMAGE)}
+              renderItem={item => <List.Item>{item}</List.Item>}
+            />
+            <Divider orientation="left">{ContentType.MARKDOWN}</Divider>
+            <List
+              size="small"
+              bordered
+              dataSource={listTypedItems(ContentType.MARKDOWN)}
+              renderItem={item => <List.Item>{item}</List.Item>}
+            />
+            <Divider orientation="left">{ContentType.IMAGE}</Divider>
+            <List
+              size="small"
+              bordered
+              dataSource={listTypedItems(ContentType.IMAGE)}
+              renderItem={item => <List.Item>{item}</List.Item>}
+            />
+            <Divider orientation="left">{ContentType.TEXT}</Divider>
+            <List
+              size="small"
+              bordered
+              dataSource={listTypedItems(ContentType.TEXT)}
+              renderItem={item => <List.Item>{item}</List.Item>}
+            />
+           </Col>
+        </Row>
+     </div>
     );
   }
 }

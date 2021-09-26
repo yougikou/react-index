@@ -68,7 +68,7 @@ class App extends React.Component<any, StateType> {
               }
             })}
             {items.map((_item: DirItemType, _index: number) => {
-              let typeSetting = folderSettings.find(elt => elt.path === _item.linkString);
+              let typeSetting = folderSettings.find(elt => elt.path === _item.pathString);
               let pathUrl = "/" + _item.linkString + "/:category";
               return(
                 <Route 
